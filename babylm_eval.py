@@ -34,6 +34,7 @@ if __name__ == "__main__":
     parser.add_argument('--device', type=str, default="cuda",) #NOTE: For DDP evaluation
     parser.add_argument('--process_index', type=int, default=0,) #NOTE: For DDP evaluation
     parser.add_argument('--world_size', type=int, default=1,) #NOTE: For DDP evaluation
+    parser.add_argument('--dry_run', type=bool, default=False,)
     args = parser.parse_args()
 
     MODEL_TYPE_REMAP = {"decoder only": "hf-causal", "decoder": "hf-causal",
@@ -48,7 +49,7 @@ if __name__ == "__main__":
         for task_type in TASKS.keys():
             tasks.extend(TASKS[task_type])
     else:
-        tasks = TASKS[args.tasks]
+        tasks = TASKS[args.tasks][:(1 if args.dry_run else None)]
 
     accuracies = {}
     # Iterate through tasks, get accuracies
