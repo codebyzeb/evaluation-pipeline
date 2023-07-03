@@ -5,13 +5,11 @@
 
 This code provides the backend for the BabyLM Challenge's evaluation pipeline. 
 
-We provide support for zero-shot evaluations on BLiMP, as well as scripts for fine-tuning HuggingFace-based models on GLUE tasks.
+We provide support for zero-shot evaluations on BLiMP, as well as scripts for fine-tuning HuggingFace-based models on GLUE and MSGS tasks.
 
 We also provide a [Colab demo](https://colab.research.google.com/drive/1HX2D3wztO81tKcqCeV_ecRcEUseBVuTc?usp=sharing) of the evaluation pipeline as a demonstration of how to use the code.
 
 If you have questions about or suggestions for this code, please open an issue and consider [joining our Slack](https://join.slack.com/t/babylmchallenge/shared_invite/zt-1s8el4mro-qvVO447l3POBZcUNvMWQcg). We also welcome pull requests!
-
-We adapt this primarily from the BigScience fork of [lm-eval-harness](https://github.com/bigscience-workshop/lm-evaluation-harness), originally by EleutherAI. Support for masked language models was made possible by [minicons](https://github.com/kanishkamisra/minicons)' implementation of MLM scoring (itself based on [code by Salazar et al. (2020)](https://github.com/awslabs/mlm-scoring)).
 
 ## Installation
 
@@ -27,13 +25,13 @@ pip install torch==1.11.0+cu113 torchvision==0.12.0+cu113 torchaudio==0.11.0 --e
 If your GPU is compatible with CUDA 10, replace all instances of `cu113` with `cu102`.
 
 ### Data
-We provide versions of BLiMP and GLUE which have been filtered according to the vocabulary of the `strict-small` dataset. We filter for examples where each word has appeared in our training set at least twice.
+We provide versions of BLiMP, GLUE, and MSGS which have been filtered according to the vocabulary of the `strict-small` dataset. We filter for examples where each word has appeared in our training set at least twice.
 
 Unzip the dataset into the root directory of this repository: `unzip filter_data.zip`.
 
 ## Usage
 ### Zero-shot Evaluation
-To evaluate a model on zero-shot tasks like BLiMP:
+To evaluate a model on zero-shot tasks like BLiMP and the held-out BLiMP supplement tasks:
 
 ```bash
 python babylm_eval.py 'path/to/model_and_tokenizer' 'model_type'
@@ -42,7 +40,7 @@ python babylm_eval.py 'path/to/model_and_tokenizer' 'model_type'
 Where `model_type` is one of "encoder", "decoder" or "encoder-decoder".
 
 ### Fine-tuning
-To fine-tune and evaluate a model on tasks that require fine-tuning, like the (Super)GLUE tasks:
+To fine-tune and evaluate a model on tasks that require fine-tuning, like the (Super)GLUE tasks or held-out MSGS tasks:
 
 ```bash
 ./finetune_all_tasks.sh 'path/to/model_and_tokenizer'
@@ -65,10 +63,20 @@ Here are the defaults that we use:
 We provide a shell script that will collect your results into a single file:
 
 ```bash
-./collect_results.sh path/to/model_and_tokenizer
+./collect_results.py path/to/model_and_tokenizer
 ```
 
-We will ask you to share your results, model, and tokenizer. We will evaluate on held-out tasks (TBA) as part of the final evaluation.
+This will output a file called `all_predictions.json` in the root folder of this repository. We will ask you to upload this file to a submission portal.
+
+We will also ask you to share a link where we can download your model and tokenizer. We will evaluate on held-out tasks as part of the final evaluation.
+
+### Format of Predictions
+If you wish to submit your results and you are not using the `collect_results.py` script, please ensure that your predictions file conforms to the submission format (example provided here as `sample_predictions.json`). This is a file consisting of line-separated JSON objects, where each line corresponds to a single subtask.
+
+For each line, the JSON object includes a `task` field ("blimp", "glue", "supplement", or "msgs"), a `sub_task` field (the specific task, like "cola" or "anaphor_agreement"), and a `predictions` field, which is a list of JSON objects containing example IDs and predictions for those examples. Here is an example:
+```
+{"task": "glue", "sub_task": "mnli", "predictions": [{"id": "mnli_0", "pred": 0}, {"id": "mnli_1": "pred": 1}, ..., {"id": "mnli_6561", "pred": 1}]}
+```
 
 ## Baselines
 We provide a series of baseline models that we train on our strict or strict-small dataset. These are [hosted on HuggingFace](https://huggingface.co/babylm).
@@ -115,8 +123,6 @@ Here are baseline scores. These are all accuracies, unless otherwise noted by (F
 -----------------------
 
 These are naïve baselines that are meant to provide a starting point for investigation. We look forward to seeing how you will improve upon these!
-
-We [provide the code](https://github.com/babylm/baseline-pretraining) used to train these baselines. We do not recommend using this for your own models, as it loads tokenizers from huggingface instead of training from scratch on the BabyLM data (which does not qualify for any of our tracks). That said, we found (in some quick preliminary experiments) that simply training tokenizers on the BabyLM data often outperforms these baselines!
 
 ## Citation
 If you use the datasets or code from this repository, please cite the BabyLM Call for Papers:
