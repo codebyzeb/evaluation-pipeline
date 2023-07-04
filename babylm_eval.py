@@ -57,7 +57,8 @@ if __name__ == "__main__":
         for task_type in TASKS.keys():
             tasks.extend(TASKS[task_type])
     else:
-        tasks = TASKS[args.tasks][:(1 if args.dry_run else None)]
+        tasks = TASKS[args.tasks]
+    tasks = tasks[:(1 if args.dry_run else None)]
 
     accuracies = {}
     # Iterate through tasks, get accuracies
