@@ -79,7 +79,7 @@ if __name__ == "__main__":
         preds_path = os.path.join(args.model_path, "zeroshot", task, "predictions.txt")
         task_dicts[task] = make_task_dict(task, preds_path)
 
-    with open("all_predictions.json", "w") as predictions_out:
+    with open(os.path.join(args.model_path, "all_predictions.json"), "w") as predictions_out:
         for task in task_dicts:
             predictions_out.write(json.dumps(task_dicts[task]) + "\n")
     print("Predictions output at `all_predictions.json`.")
