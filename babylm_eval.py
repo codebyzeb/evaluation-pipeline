@@ -88,6 +88,7 @@ if __name__ == "__main__":
             try: 
                 accuracies[task_title] = accuracy_on_task(task, eval_model, template,
                             args.num_fewshot)
+                _completed_task = True
             except ValueError as e: 
                 if _task_sleep_time > 64:
                     raise ValueError(f"Failed to run eval task after 64 seconds - Exception: {e}")
