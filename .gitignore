@@ -54,3 +54,6 @@ baselines/
 # outputs from running scripts
 .out
 .err
+
+# filtered data 
+filter-data/
