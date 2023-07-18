@@ -2,6 +2,7 @@ import argparse
 import lm_eval
 import os
 import json
+import time
 import torch.distributed as dist
 
 TASKS = {
@@ -79,8 +80,22 @@ if __name__ == "__main__":
             task = f"blimp_from_file:filter-data/supplement_filtered/{task}"
         else:
             raise ValueError("Unrecognized task!")
-        accuracies[task_title] = accuracy_on_task(task, eval_model, template,
-                    args.num_fewshot)
+
+        ## NOTE: Retry loop to resolve conflicting file access
+        _task_sleep_time = 1
+        _completed_task = False
+        while not _completed_task:
+            try: 
+                accuracies[task_title] = accuracy_on_task(task, eval_model, template,
+                            args.num_fewshot)
+            except ValueError as e: 
+                if _task_sleep_time > 64:
+                    raise ValueError(f"Failed to run eval task after 64 seconds - Exception: {e}")
+
+                # catches ValueError: I/O operation on closed file.
+                time.sleep(_task_sleep_time)
+                _task_sleep_time *= 2
+
         print(f"{task_title}:\t{accuracies[task_title] * 100:.2f}%")
         # Write scores to file
         out_path = os.path.join(args.model_path, "zeroshot", task_title, "eval_results.json")
