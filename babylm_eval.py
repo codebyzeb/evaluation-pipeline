@@ -89,9 +89,11 @@ if __name__ == "__main__":
                 accuracies[task_title] = accuracy_on_task(task, eval_model, template,
                             args.num_fewshot)
                 _completed_task = True
-            except ValueError as e: 
+            except Exception as e:
+                print(f"Failed to run eval task: {task_title} - Exception: {e} -- retrying in {_task_sleep_time} seconds")
+
                 if _task_sleep_time > 64:
-                    raise ValueError(f"Failed to run eval task after 64 seconds - Exception: {e}")
+                    raise RuntimeError(f"Failed to run eval task after 64 seconds - Exception: {e}")
 
                 # catches ValueError: I/O operation on closed file.
                 time.sleep(_task_sleep_time)

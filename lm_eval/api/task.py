@@ -75,7 +75,7 @@ class Task(abc.ABC):
         """
         if file_path:
             self.load_from_file(file_path, cache_dir,
-                                download_mode=datasets.DownloadMode.FORCE_REDOWNLOAD)
+                                download_mode=datasets.DownloadMode.REUSE_DATASET_IF_EXISTS)
         else:
             self.download(data_dir, cache_dir, download_mode)
         self._training_docs = None
