@@ -68,16 +68,20 @@ if __name__ == "__main__":
     task_dicts = {}
     for task in TASKS["glue"]:
         preds_path = os.path.join(args.model_path, "finetune", task, "predict_results.txt")
-        task_dicts[task] = make_task_dict(task, preds_path)
+        if os.path.exists(preds_path):
+            task_dicts[task] = make_task_dict(task, preds_path)
     for task in TASKS["msgs"]:
         preds_path = os.path.join(args.model_path, "finetune", task, "predict_results.txt")
-        task_dicts[task] = make_task_dict(task, preds_path)
+        if os.path.exists(preds_path):
+            task_dicts[task] = make_task_dict(task, preds_path)
     for task in TASKS["blimp"]:
         preds_path = os.path.join(args.model_path, "zeroshot", task, "predictions.txt")
-        task_dicts[task] = make_task_dict(task, preds_path)
+        if os.path.exists(preds_path):
+            task_dicts[task] = make_task_dict(task, preds_path)
     for task in TASKS["supplement"]:
         preds_path = os.path.join(args.model_path, "zeroshot", task, "predictions.txt")
-        task_dicts[task] = make_task_dict(task, preds_path)
+        if os.path.exists(preds_path):
+            task_dicts[task] = make_task_dict(task, preds_path)
 
     with open(os.path.join(args.model_path, "all_predictions.json"), "w") as predictions_out:
         for task in task_dicts:
